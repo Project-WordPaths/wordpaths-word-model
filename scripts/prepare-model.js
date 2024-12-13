@@ -129,9 +129,11 @@ for(let word of filteredVocabulary) {
 
 // --- saving vectors 
 console.log("Saving vectors.")
-const flattened = Array_.flatten(vectors) 
+const flattened = Array_.flatten(filteredVectors) 
 vectorBytes = Encoder_.encodeFloatArrayToBytes(flattened) 
 fs.writeFileSync(OUTPUT_FOLDER + "/vectors.bin", vectorBytes)
+
+
 
 
 console.log("Done.")
