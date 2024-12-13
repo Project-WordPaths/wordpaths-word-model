@@ -116,6 +116,13 @@ for(let i = 0; i < filteredVocabulary.length; i++) {
     wordIndex[filteredVocabulary[i]] = i
 }
 
+// --- construct word index
+console.log("Saving word index.")
+fs.writeFileSync(
+    OUTPUT_FOLDER + "/word-index.json", 
+    JSON.stringify(wordIndex, null, 4)
+)
+
 // --- filtering vectors
 console.log("Filtering word vectors.")
 const filteredVectors = []
