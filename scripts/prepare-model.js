@@ -24,6 +24,13 @@ console.log("Loading vocabulary.")
 const vocabulary = fs.readFileSync(VOCABULARY_FILE).toString().split("\n")
 console.log(`\tDetected ${vocabulary.length} words.`)
 
+// --- construct word index
+console.log("Constructing word index.")
+let originalWordIndex      = {} 
+for(let i = 0; i < vocabulary.length; i++) {
+    originalWordIndex[vocabulary[i]] = i
+}
+
 // --- loading stopwords 
 console.log("Loading stopwords.")
 const stopWords = new Set(fs.readFileSync(STOP_WORDS_FILE).toString().split("\n"))
@@ -36,7 +43,7 @@ const cefrData = JSON.parse(fs.readFileSync(CEFR_DATA_FILE))
 // --- filtering vocabulary 
 console.log("Filtering vocabulary.") 
 let punctuations = "~!@#$%^&*()_+`=[]{};':\",./<>?".split("")
-let filteredVocabulary = new Set(
+let filteredVocabulary = 
     vocabulary.filter((word) => {
         for(let i of ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]) {
             if(word.includes(i)) return false
@@ -52,15 +59,16 @@ let filteredVocabulary = new Set(
         }
         return true
     })
-)
+
 console.log(`\tFiltered ${filteredVocabulary.size} words.`)
+
 
 
 // --- save filtered vocabulary 
 console.log("Saving filtered vocabulary.")
 fs.writeFileSync(
     OUTPUT_FOLDER + "/vocabulary.txt", 
-    [...filteredVocabulary].join("\n")
+    filteredVocabulary.join("\n")
 )
 
 // --- group words based on cefr vectors 
@@ -77,15 +85,23 @@ const cefrGroups = {
 let i = 0
 let gathered = 0
 let n = Object.keys(cefrData["map"]).length
+let filteredVocabularySet = new Set([...filteredVocabulary])
 for(let word in cefrData["map"]) {
     console.log(`---- Gathering CEFR data ${i} of ${n} (Gathered: ${gathered})`)
-    if(filteredVocabulary.has(word)) {
+    if(filteredVocabularySet.has(word)) {
         const level = cefrData["map"][word][0]
         cefrMap[word] = level
         cefrGroups[level][word] = true
         gathered += 1
     }
     i += 1
+}
+
+// --- creonstruct word index
+console.log("Reconstructing word index.")
+const reconstructedWordIndex      = {} 
+for(let i = 0; i < filteredVocabulary.length; i++) {
+    reconstructedWordIndex[filteredVocabulary[i]] = i
 }
 
 // --- save cefr data 
@@ -108,19 +124,13 @@ let vectors          = Encoder_.decodeFloatArrayFromBytes(vectorBytes)
 vectors              = Array_.partition(vectors, 50)
 console.log(`\tVectors: (${vectors.length}, ${vectors[0].length})`)
 
-// --- construct word index
-console.log("Constructing word index.")
-const wordIndex      = {} 
-filteredVocabulary   =  [...filteredVocabulary]
-for(let i = 0; i < filteredVocabulary.length; i++) {
-    wordIndex[filteredVocabulary[i]] = i
-}
+
 
 // --- construct word index
 console.log("Saving word index.")
 fs.writeFileSync(
     OUTPUT_FOLDER + "/word-index.json", 
-    JSON.stringify(wordIndex, null, 4)
+    JSON.stringify(reconstructedWordIndex, null, 4)
 )
 
 // --- filtering vectors
@@ -130,7 +140,7 @@ i = 0
 n = filteredVocabulary.length
 for(let word of filteredVocabulary) {
     console.log(`---- Filtering vector ${i} of ${n}`)
-    filteredVectors.push(vectors[wordIndex[word]])
+    filteredVectors.push(vectors[originalWordIndex[word]])
     i += 1
 }
 

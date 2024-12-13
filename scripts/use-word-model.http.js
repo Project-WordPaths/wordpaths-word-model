@@ -18,7 +18,6 @@ await model.load({
     }
 })
 
-console.log(model.vectors.length)
-console.log(model.closest1.length)
+console.log(model.normalizedDistance("picnic", "barbecues"))
 
 console.log("Done.")

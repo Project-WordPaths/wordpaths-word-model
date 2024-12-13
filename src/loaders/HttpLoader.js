@@ -9,7 +9,7 @@ export default class FSLoader
     static async loadVocabulary(model) {
        const response = await axios.get(model.files.vocabulary) 
        const data = response.data 
-       model.vocabulary = data
+       model.vocabulary = data.toString().split("\n")
     }
 
     static async loadWordIndex(model) {

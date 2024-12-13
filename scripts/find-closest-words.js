@@ -4,6 +4,11 @@ import Encoder_ from "wordpaths-common/src/Encoder_.js"
 import Array_ from "wordpaths-common/src/Array_.js"
 import Annoy from "annoy"
 
+function normalize(vector) {
+    const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+    return vector.map(val => val / magnitude);
+}
+
 console.log("CLOSEST WORDS FINDER")
 console.log("========================================================")
 
@@ -24,11 +29,11 @@ console.log(`\tVectors: (${vectors.length}, ${vectors[0].length})`)
 
 // --- prepare indexer 
 console.log("Preparing indexer.")
-const indexer = new Annoy(100, 'Angular')
+const indexer = new Annoy(500, 'Euclidean')
 for(let i = 0; i < vectors.length; i++) {
     console.log(`---- Adding item ${i} of ${vectors.length}.`)
     const vector = vectors[i]
-    indexer.addItem(i, vector)
+    indexer.addItem(i, normalize(vector))
 }
 
 // --- build indexer 
@@ -43,9 +48,22 @@ const top100  = []
 const top1000 = []
 
 for(let i = 0; i < vectors.length; i++) {
-    console.log(`---- Finding closest items ${i} of ${vectors.length}`)
-    const results = indexer.getNNsByItem(i, 1001).slice(1)
-    top1.push(results[0])
+    console.log(`---- Finding closest items ${i + 1} of ${vectors.length}`)
+    let results 
+
+    results = indexer.getNNsByVector(vectors[i], 1001).slice(1)
+
+    let closest = null
+    let j = 0
+    
+    while(results[j] == i) {
+        console.log("--- INCR")
+        j += 1
+    }
+
+    closest = results[j]
+
+    top1.push(closest)
     top10.push(results[9])
     top100.push(results[99])
     top1000.push(results[999])

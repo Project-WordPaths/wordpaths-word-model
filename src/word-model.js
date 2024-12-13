@@ -2,6 +2,7 @@ import Chance from "chance"
 import ProgressItems_ from "wordpaths-common/src/ProgressItems_.js"
 import FSLoader from "./loaders/FSLoader.js"
 import HttpLoader from "./loaders/HttpLoader.js"
+import Math_ from "wordpaths-common/src/Math_.js"
 
 export class WordModel 
 {
@@ -100,5 +101,40 @@ export class WordModel
         else if(this.mode == "http") {
             this.loader = HttpLoader
         }
+    }
+
+    /** === CORE FUNCTIONS === */
+    
+    vector(index) {
+        return this.vectors[index]
+    }
+
+    word(index) {
+        return this.vocabulary[index]
+    }
+
+    indexOfWord(word) {
+        return this.wordIndex[word]
+    }
+
+    vectorOfWord(word) {
+        return this.vector(this.indexOfWord(word))
+    }
+
+    distance(wordA, wordB) {
+        return Math_.adjustedCosineDistance(
+            this.vectorOfWord(wordA), 
+            this.vectorOfWord(wordB)
+        )
+    }
+
+    normalizedDistance(wordA, wordB) {
+        const closestIndex = this.closest1[this.indexOfWord(wordA)]
+        const min          = this.distance(wordA, this.word(closestIndex)) 
+        const max          = 1 
+        const distance     = this.distance(wordA, wordB) 
+        const normalized   = (distance - min) / (max - min)
+        console.log(distance, min, max)
+        return Math.min(1, Math.max(normalized, 0))
     }
 }
