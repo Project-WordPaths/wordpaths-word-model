@@ -34,36 +34,12 @@ export default class FSLoader
         model.cefrGroups = cefrGroups
     }
 
-    static async loadClosest1(model) {
+    static async loadClosest(model) {
         const fs = (await import("fs")).default
-        const closest1File = model.files.closest1
-        let closest1 = fs.readFileSync(closest1File)
-        closest1 = Encoder_.decodeIntArrayFromBytes(closest1) 
-        model.closest1 = closest1
-    }
-
-    static async loadClosest10(model) {
-        const fs = (await import("fs")).default
-        const closest10File = model.files.closest10
-        let closest10 = fs.readFileSync(closest10File)
-        closest10 = Encoder_.decodeIntArrayFromBytes(closest10) 
-        model.closest10 = closest10
-    }
-
-    static async loadClosest100(model) {
-        const fs = (await import("fs")).default
-        const closest100File = model.files.closest100
-        let closest100 = fs.readFileSync(closest100File)
-        closest100 = Encoder_.decodeIntArrayFromBytes(closest100) 
-        model.closest100 = closest100
-    }
-
-    static async loadClosest1000(model) {
-        const fs = (await import("fs")).default
-        const closest1000File = model.files.closest1000
-        let closest1000 = fs.readFileSync(closest1000File)
-        closest1000 = Encoder_.decodeIntArrayFromBytes(closest1000) 
-        model.closest1000 = closest1000
+        const closestFile = model.files.closest
+        let closest = fs.readFileSync(closestFile)
+        closest = Encoder_.decodeIntArrayFromBytes(closest) 
+        model.closest = closest
     }
 
     static async loadVectors(model, onSubProgress) {
@@ -76,5 +52,17 @@ export default class FSLoader
         const floatArray = Encoder_.decodeFloatArrayFromBytes(bytes)
         const vectors = Array_.partition(floatArray, model.dims) 
         model.vectors = vectors
+    }
+
+    static async loadVectorsPCA(model, onSubProgress) {
+        const fs = (await import("fs")).default
+        const vectorsFile = model.files.vectorsPCA
+        const bytes = await FSFileReader.load(vectorsFile, { 
+            onProgress: onSubProgress,
+            chunkSize: 50000
+        })
+        const floatArray = Encoder_.decodeFloatArrayFromBytes(bytes)
+        const vectors = Array_.partition(floatArray, 2) 
+        model.vectorsPCA = vectors
     }
 }

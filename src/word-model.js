@@ -23,25 +23,30 @@ export class WordModel
             vocabulary    : this.source + "/vocabulary.txt",
             wordIndex     : this.source + "/word-index.json", 
             vectors       : this.source + "/vectors.bin",
+            vectorsPCA    : this.source + "/vectors.pca2d.bin",
             cefrMap       : this.source + "/cefr-map.json", 
             cefrGroups    : this.source + "/cefr-groups.json",
-            closest1      : this.source + "/closest-1.bin",
-            closest10     : this.source + "/closest-10.bin",
-            closest100    : this.source + "/closest-100.bin",
-            closest1000   : this.source + "/closest-100.bin",
+            closest       : this.source + "/closest.bin"
         }
         
+        // --- cefr level no 
+        this.cefrLevelNo = {
+            "A1" : 1, 
+            "A2" : 2,
+            "B1" : 3, 
+            "B2" : 4, 
+            "C1" : 5, 
+            "C2" : 6
+        }
 
         // --- model variables 
         this.vocabulary  = null 
         this.wordIndex   = null
         this.vectors     = null
-        this.closest1    = null 
-        this.closest10   = null 
-        this.closest100  = null 
-        this.closest1000 = null
+        this.closest     = null
         this.cefrMap     = null 
         this.cefrGroups  = null
+        this.vectorsPCA  = null
     }
 
     async load({ onProgress = null, onSubProgress = null } = {}) {
@@ -69,25 +74,16 @@ export class WordModel
             await this.loader.loadCefrGroups(self)
         })
 
-    
-        tasks.add("load.closest-1", async () => {
-            await this.loader.loadClosest1(self)
-        })
-
-        tasks.add("load.closest-10", async () => {
-            await this.loader.loadClosest10(self)
-        })
-
-        tasks.add("load.closest-100", async () => {
-            await this.loader.loadClosest100(self)
-        })
-
-        tasks.add("load.closest-1000", async () => {
-            await this.loader.loadClosest1000(self)
+        tasks.add("load.closest", async () => {
+            await this.loader.loadClosest(self)
         })
 
         tasks.add("load.vectors", async () => {
             await this.loader.loadVectors(self, onSubProgress)
+        })
+
+        tasks.add("load.vectors-pca", async () => {
+            await this.loader.loadVectorsPCA(self, onSubProgress)
         })
 
         // --- run tasks 
@@ -121,20 +117,46 @@ export class WordModel
         return this.vector(this.indexOfWord(word))
     }
 
-    distance(wordA, wordB) {
-        return Math_.adjustedCosineDistance(
+    wordDistance(wordA, wordB) {
+        return this.vectorDistance(
             this.vectorOfWord(wordA), 
             this.vectorOfWord(wordB)
         )
     }
 
     normalizedDistance(wordA, wordB) {
-        const closestIndex = this.closest1[this.indexOfWord(wordA)]
-        const min          = this.distance(wordA, this.word(closestIndex)) 
-        const max          = 1 
-        const distance     = this.distance(wordA, wordB) 
+        const closestIndex  = this.closest[this.indexOfWord(wordA)]
+        const farthestIndex = this.farthest[this.indexOfWord(wordA)]
+        const min          = this.wordDistance(wordA, this.word(closestIndex)) 
+        const max          = this.wordDistance(wordA, this.word(farthestIndex))
+        const distance     = this.wordDistance(wordA, wordB) 
         const normalized   = (distance - min) / (max - min)
-        console.log(distance, min, max)
         return Math.min(1, Math.max(normalized, 0))
+    }
+
+    centroidOfWords(words) {
+        return Math_.centroid(words.map(word => this.vectorOfWord(word)))
+    }
+
+    vectorDistance(vectorA, vectorB) {
+        return Math_.adjustedCosineDistance(vectorA, vectorB)
+    }
+
+    randomWord(group = "all") {
+        if(group == "all") {
+            return this.random.pickone(this.vocabulary)
+        }
+        else {
+            const groupWords = Object.keys(this.cefrGroups[group])
+            return this.random.pickone(groupWords)
+        }
+    }
+
+    cefrLevelOf(word) {
+        return this.cefrMap[word]
+    }
+
+    cefrLevelNoOf(word) {
+        return this.cefrLevelNo[this.cefrLevelOf(word)]
     }
 }

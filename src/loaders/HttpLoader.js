@@ -30,44 +30,14 @@ export default class FSLoader
         model.cefrGroups = data
     }
 
-    static async loadClosest1(model) {
+    static async loadClosest(model) {
         const response = await axios.get(
-            model.files.closest1, 
+            model.files.closest, 
             { responseType: "arraybuffer" }
         ) 
         const data = response.data 
-        const closest1 = Encoder_.decodeIntArrayFromBytes(data)
-        model.closest1 = closest1
-    }
-
-    static async loadClosest10(model) {
-        const response = await axios.get(
-            model.files.closest10, 
-            { responseType: "arraybuffer" }
-        ) 
-        const data = response.data 
-        const closest10  = Encoder_.decodeIntArrayFromBytes(data)
-        model.closest10 = closest10
-    }
-
-    static async loadClosest100(model) {
-        const response = await axios.get(
-            model.files.closest100, 
-            { responseType: "arraybuffer" }
-        ) 
-        const data = response.data 
-        const closest100  = Encoder_.decodeIntArrayFromBytes(data)
-        model.closest100 = closest100
-    }
-
-    static async loadClosest1000(model) {
-        const response = await axios.get(
-            model.files.closest1000, 
-            { responseType: "arraybuffer" }
-        ) 
-        const data = response.data 
-        const closest1000  = Encoder_.decodeIntArrayFromBytes(data)
-        model.closest1000 = closest1000
+        const closest = Encoder_.decodeIntArrayFromBytes(data)
+        model.closest = closest
     }
 
     static async loadVectors(model, onSubProgress) {
@@ -80,5 +50,17 @@ export default class FSLoader
         const floatArray = Encoder_.decodeFloatArrayFromBytes(bytes)
         const vectors = Array_.partition(floatArray, model.dims) 
         model.vectors = vectors
+    }
+
+    static async loadVectors(model, onSubProgress) {
+        const vectorsFile = model.files.vectorsPCA
+        const bytes = await HttpFileReader.load(vectorsFile, { 
+            onProgress: onSubProgress,
+            chunkSize: 50000,
+            type : "arraybuffer"
+        })
+        const floatArray = Encoder_.decodeFloatArrayFromBytes(bytes)
+        const vectors = Array_.partition(floatArray, 2) 
+        model.vectorsPCA = vectors
     }
 }

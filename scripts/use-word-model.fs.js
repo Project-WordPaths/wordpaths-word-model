@@ -18,7 +18,6 @@ await model.load({
     }
 })
 
-console.log(model.closest1.length)
-console.log(model.vectors.length)
+console.log(model.cefrLevelOf("domination"))
 
 console.log("Done.")
