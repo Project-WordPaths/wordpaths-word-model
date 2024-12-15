@@ -126,12 +126,28 @@ export class WordModel
 
     normalizedDistance(wordA, wordB) {
         const closestIndex  = this.closest[this.indexOfWord(wordA)]
-        const farthestIndex = this.farthest[this.indexOfWord(wordA)]
         const min          = this.wordDistance(wordA, this.word(closestIndex)) 
-        const max          = this.wordDistance(wordA, this.word(farthestIndex))
+        const max          = 1
         const distance     = this.wordDistance(wordA, wordB) 
         const normalized   = (distance - min) / (max - min)
         return Math.min(1, Math.max(normalized, 0))
+    }
+
+    similarityScore(wordA, wordB) {
+        return Math_.similarityScore(
+            this.vectorOfWord(wordA), 
+            this.vectorOfWord(wordB)
+        )
+    }
+
+    normalizedSimilarityScore(wordA, wordB) {
+        const closestIndex  = this.closest[this.indexOfWord(wordA)]
+        const min           = 1 - this.similarityScore(wordA, this.word(closestIndex)) 
+        const max           = 1
+        const score         = 1 - this.similarityScore(wordA, wordB) 
+        const normalized    = ((score - min) / (max - min))
+        const clipped       = Math.min(1, Math.max(normalized, 0))
+        return 1 - clipped
     }
 
     centroidOfWords(words) {
@@ -158,5 +174,9 @@ export class WordModel
 
     cefrLevelNoOf(word) {
         return this.cefrLevelNo[this.cefrLevelOf(word)]
+    }
+
+    hasWord(word) {
+        return word in this.wordIndex
     }
 }

@@ -52,7 +52,7 @@ export default class FSLoader
         model.vectors = vectors
     }
 
-    static async loadVectors(model, onSubProgress) {
+    static async loadVectorsPCA(model, onSubProgress) {
         const vectorsFile = model.files.vectorsPCA
         const bytes = await HttpFileReader.load(vectorsFile, { 
             onProgress: onSubProgress,

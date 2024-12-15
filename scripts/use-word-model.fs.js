@@ -9,14 +9,7 @@ const model = new WordModel(
 )
 
 console.log("Loading model.")
-await model.load({
-    onProgress(perc, message) {
-        console.log(`---- Loading (${perc .toFixed(2)}) ${message}`)
-    },
-    onSubProgress(i, n) {
-        console.log(`\t---- Loading ${i} of ${n}`)
-    }
-})
+29 
 
 console.log(model.cefrLevelOf("domination"))
 
