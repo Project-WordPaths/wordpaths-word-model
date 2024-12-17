@@ -23,7 +23,6 @@ export class WordModel
             vocabulary    : this.source + "/vocabulary.txt",
             wordIndex     : this.source + "/word-index.json", 
             vectors       : this.source + "/vectors.bin",
-            vectorsPCA    : this.source + "/vectors.pca2d.bin",
             cefrMap       : this.source + "/cefr-map.json", 
             cefrGroups    : this.source + "/cefr-groups.json",
             closest       : this.source + "/closest.bin"
@@ -80,10 +79,6 @@ export class WordModel
 
         tasks.add("load.vectors", async () => {
             await this.loader.loadVectors(self, onSubProgress)
-        })
-
-        tasks.add("load.vectors-pca", async () => {
-            await this.loader.loadVectorsPCA(self, onSubProgress)
         })
 
         // --- run tasks 
