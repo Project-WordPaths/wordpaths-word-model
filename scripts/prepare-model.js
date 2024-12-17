@@ -2,6 +2,7 @@ import fs from "fs"
 import { makeDirectory } from "wordpaths-common/src/Common_.js" 
 import Encoder_ from "wordpaths-common/src/Encoder_.js"
 import Array_ from "wordpaths-common/src/Array_.js"
+import Math_ from "wordpaths-common/src/Math_.js"
 
 console.log("MODEL PREPARATION SCRIPT")
 console.log("========================================================")
@@ -140,7 +141,8 @@ i = 0
 n = filteredVocabulary.length
 for(let word of filteredVocabulary) {
     console.log(`---- Filtering vector ${i} of ${n}`)
-    filteredVectors.push(vectors[originalWordIndex[word]])
+    const normalizedVector = Math_.normalize(vectors[originalWordIndex[word]])
+    filteredVectors.push(normalizedVector)
     i += 1
 }
 
