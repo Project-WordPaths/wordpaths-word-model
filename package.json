@@ -1,0 +1,33 @@
+{
+  "name": "wordpaths-common",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Common helpers functions needed for WordPaths in single-player and multi-player mode.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/project-wordpaths/wordpaths-common.git"
+  },
+  "author": "LJ S.A. and K.G. T",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/project-wordpaths/wordpaths-common/issues"
+  },
+  "homepage": "https://github.com/project-wordpaths/wordpaths-common#readme",
+  "dependencies": {
+    "annoy": "^4.0.0",
+    "assert": "^2.1.0",
+    "axios": "^1.7.9",
+    "chance": "^1.1.12",
+    "mocha": "^11.0.1",
+    "papaparse": "^5.4.1",
+    "sync-fetch": "^0.6.0-2",
+    "tinyspy": "^3.0.2"
+  }
+}
