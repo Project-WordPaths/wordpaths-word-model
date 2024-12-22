@@ -162,7 +162,7 @@ export class WordModel
             return this.random.pickone(this.vocabulary)
         }
         else if(group == "all-with-cefr") {
-            return this.random.pickone(this.cefrMap)
+            return this.random.pickone(Object.keys(this.cefrMap))
         }
         else {
             const groupWords = Object.keys(this.cefrGroups[group])
@@ -171,11 +171,16 @@ export class WordModel
     }
 
     randomWords(count, group = "all") {
-        const words = []
-        for(let i = 0; i < count; i++) {
-            words.push(this.randomWord(group))
+        if(group == "all") {
+            return this.random.pickset(this.vocabulary, count)
         }
-        return words
+        else if(group == "all-with-cefr") {
+            return this.random.pickset(Object.keys(this.cefrMap), count)
+        }
+        else {
+            const groupWords = Object.keys(this.cefrGroups[group])
+            return this.random.pickset(groupWords, count)
+        }
     }
 
     sampleWords(wordCount, sampleCount, group = "all") {
