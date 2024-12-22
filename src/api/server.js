@@ -272,14 +272,14 @@ export class WordModelServer
             const source = req.body.source 
             const target = req.body.target 
             const inputs = req.body.inputs
-            const results = Puzzles.unthemed(
-                self.model, 
-                self.searcher,
-                constrained, 
-                source,
-                target,
-                inputs
-            ) 
+            const results = Puzzles.unthemed({
+                model: self.model, 
+                searcher: self.searcher,
+                constrained: constrained, 
+                source: source,
+                target: target,
+                inputs: inputs
+            }) 
             res.send(results)
         })
 
@@ -291,17 +291,15 @@ export class WordModelServer
             const target = req.body.target 
             const inputs = req.body.inputs
             const themes = req.body.themes
-            const themeMode = req.body.themeMode
-            const results = Puzzles.themed(
-                self.model, 
-                self.searcher,
-                constrained, 
-                source,
-                target,
-                themes, 
-                themeMode,
-                inputs
-            ) 
+            const results = Puzzles.themed({
+                model: self.model, 
+                searcher: self.searcher,
+                constrained: constrained, 
+                source: source,
+                target: target,
+                themes: themes, 
+                inputs: inputs
+            }) 
             res.send(results)
         })
 
@@ -319,27 +317,22 @@ export class WordModelServer
             const source = req.body.source 
             const target = req.body.target 
             const themes = req.body.themes
-            const themeMode = req.body.themeMode
             const seed = req.body.seed
             const solver = req.body.solver
-            const results = Solvers[solver](
-                self.model, 
-                self.searcher,
-                constrained, 
-                source,
-                target,
-                themes, 
-                themeMode,
-                seed
-            ) 
+            const results = Solvers[solver]({
+                model: self.model, 
+                searcher: self.searcher,
+                constrained: constrained, 
+                source: source,
+                target: target,
+                themes: themes, 
+                seed: seed
+            }) 
             res.send(results)
         })
 
         return solversRouter
     }
-
-    
-
 
     run(callback) {
         callback(this.app)

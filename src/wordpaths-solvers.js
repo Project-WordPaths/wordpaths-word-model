@@ -1,9 +1,21 @@
-import { Puzzles } from "wordpaths-word-model/src//wordpaths-puzzles.js"
-
 export class Solvers
 {
+	static _resolveThemes(themes, i) {
+		if(themes == null) {
+			return []
+		} else {
+			return [themes[i]]
+		}
+	}
 
-	static walkToLast(model, searcher, constrained, source, target, themes, themeMode) {
+	static walkToLast({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		themes = null
+	} = {}) {
 		const items = [source, ...new Array(themes.length).fill(null), target]
 		const visited = new Set([source, target, ...themes])
 
@@ -14,7 +26,7 @@ export class Solvers
 
 		for(let i = 1; i < items.length - 1; i++) {
 			const previousWord = items[i - 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			const solvedWord   = searcher.mostRelevantWordSkip(
 				[previousWord, ...extras, ...themesConsidered], {
 					method: "approx", 
@@ -29,7 +41,14 @@ export class Solvers
 		return items.slice(1, -1)
 	}
 
-	static walkToLastRechained(model, searcher, constrained, source, target, themes, themeMode) {
+	static walkToLastRechained({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		themes = null
+	} = {}) {
 		const items = [source, ...new Array(themes.length).fill(null), target]
 		const visited = new Set([source, target, ...themes])
 
@@ -41,7 +60,7 @@ export class Solvers
 		// handle non last words
 		for(let i = 1; i < items.length - 2; i++) {
 			const previousWord = items[i - 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			const solvedWord   = searcher.mostRelevantWordSkip(
 				[previousWord, ...extras, ...themesConsidered], {
 					method: "approx", 
@@ -54,7 +73,7 @@ export class Solvers
 		}
 
 		// --- handle last word 	
-		const themesConsidered = Puzzles.resolveThemes(themeMode, themes, themes.length - 1)
+		const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 		const secondToLastWord = items.at(-3) 
 		items[items.length - 2] = searcher.mostRelevantWordSkip(
 			[secondToLastWord, target, ...extras, ...themesConsidered], {
@@ -68,7 +87,14 @@ export class Solvers
 	}
 
 
-	static walkToFirst(model, searcher, constrained, source, target, themes, themeMode) {
+	static walkToFirst({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		themes = null
+	} = {}) {
 		const items = [source, ...new Array(themes.length).fill(null), target]
 		const visited = new Set([source, target, ...themes])
 
@@ -80,7 +106,7 @@ export class Solvers
 
 		for(let i = items.length - 2; i > 0; i--) {
 			const nextWord = items[i + 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			const solvedWord   = searcher.mostRelevantWordSkip(
 				[nextWord, ...extras, ...themesConsidered], {
 					method: "approx", 
@@ -95,7 +121,14 @@ export class Solvers
 		return items.slice(1, -1)
 	}
 
-	static walkToFirstRechained(model, searcher, constrained, source, target, themes, themeMode) {
+	static walkToFirstRechained({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		themes = null
+	} = {}) {
 		const items = [source, ...new Array(themes.length).fill(null), target]
 		const visited = new Set([source, target, ...themes])
 
@@ -107,7 +140,7 @@ export class Solvers
 		
 		for(let i = items.length - 2; i > 0; i--) {
 			const nextWord = items[i + 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			const solvedWord   = searcher.mostRelevantWordSkip(
 				[nextWord, ...extras, ...themesConsidered], {
 					method: "approx", 
@@ -121,7 +154,7 @@ export class Solvers
 
 		
 		// --- handle first word 	
-		const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+		const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 		const secondToFirstWord = items.at(-3) 
 		items[1] = searcher.mostRelevantWordSkip(
 			[source, items[2], ...extras, ...themesConsidered], {
@@ -134,7 +167,14 @@ export class Solvers
 		return items.slice(1, -1)
 	}
 
-	static walkToMiddle(model, searcher, constrained, source, target, themes, themeMode) {
+	static walkToMiddle({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		themes = null
+	} = {}) {
 		const items = [source, ...new Array(themes.length).fill(null), target]
 		const visited = new Set([source, target, ...themes])
 
@@ -148,7 +188,7 @@ export class Solvers
 		// --- walk from last to middle
 		for(let i = items.length - 2; i >= mid + 1; i--) {
 			const nextWord = items[i + 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			const solvedWord   = searcher.mostRelevantWordSkip(
 				[nextWord, ...extras, ...themesConsidered], {
 					method: "approx", 
@@ -163,7 +203,7 @@ export class Solvers
 		// --- walk from first to middle
 		for(let i = 1; i <= mid - 1; i++) {
 			const prevWord = items[i - 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			const solvedWord   = searcher.mostRelevantWordSkip(
 				[prevWord, ...extras, ...themesConsidered], {
 					method: "approx", 
@@ -176,7 +216,7 @@ export class Solvers
 		}
 
 		// --- rechain middle word
-		const themesConsidered = Puzzles.resolveThemes(themeMode, themes, mid - 1)
+		const themesConsidered = Solvers._resolveThemes(themes, mid - 1)
 		items[mid] = searcher.mostRelevantWordSkip(
 			[items[mid - 1], items[mid + 1], ...extras, ...themesConsidered], {
 				method: "approx",
@@ -188,7 +228,15 @@ export class Solvers
 		return items.slice(1, -1)
 	}
 
-	static walkFromMiddle(model, searcher, constrained, source, target, themes, themeMode, seed) {
+	static walkFromMiddle({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		themes = null,
+		seed = null
+	} = {}) {
 		const items = [source, ...new Array(themes.length).fill(null), target]
 		const visited = new Set([source, target, ...themes])
 
@@ -201,7 +249,7 @@ export class Solvers
 
 		// --- find middle word
 		if(!seed) {
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, mid)		
+			const themesConsidered = Solvers._resolveThemes(themes, mid - 1)
 			items[mid] = searcher.mostRelevantWordSkip(
 				[source, target, ...themesConsidered], {
 					method: "approx",
@@ -218,7 +266,7 @@ export class Solvers
 		// --- walk from last to middle
 		for(let i = items.length - 2; i >= mid + 1; i--) {
 			const nextWord = items[i + 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			let keyWords = [nextWord, ...extras, ...themesConsidered]
 			if(i == mid + 1) {
 				keyWords.push(items[mid])
@@ -237,7 +285,7 @@ export class Solvers
 		// --- walk from first to middle
 		for(let i = 1; i <= mid - 1; i++) {
 			const prevWord = items[i - 1]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1)
+			const themesConsidered = Solvers._resolveThemes(themes, i - 1)
 			let keyWords = 	[prevWord, ...extras, ...themesConsidered]
 			if(i == mid -  1) {
 				extras.push(items[mid])

@@ -2,11 +2,19 @@ import Math_ from "wordpaths-common/src/Math_.js"
 
 export class Puzzles 
 {
-	static unthemed(model, searcher, constrained, source, target, inputs) {
+	static unthemed({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null, 
+		target = null, 
+		inputs = null
+	} = {}) {
 		const items  = [source,  ...inputs, target]
 		const scores = []
 		let subScores = []
 		let inspectScores = []
+		let normalizedScores = []
 		let keyWordsAll = []
 
 		let extras = []
@@ -20,6 +28,11 @@ export class Puzzles
 			let keyWords = [previousWord, ...extras]
 			keyWords = [...new Set(keyWords)]
 			inspectScores.push(searcher.similarityScores(inputWord, keyWords))
+			normalizedScores.push(
+				keyWords.map((keyWord) => model.normalizedSimilarityScore(
+					inputWord, keyWord
+				))
+			)			
 			keyWordsAll.push(keyWords)
 			const score = searcher.normalizedRelevanceScore(inputWord, keyWords) 
 			subScores.push(score)
@@ -30,7 +43,7 @@ export class Puzzles
 		const finalScore = Math_.geometricMean([averageScore, minScore])
 
 		return {
-			gameMode      : "themed",	
+			gameMode      : "unthemed",	
 			constrained   : constrained, 	
 			source	      : source,
 			target	      : target,
@@ -45,11 +58,20 @@ export class Puzzles
 	}
 
 
-	static themed(model, searcher, constrained, source, target, themes, themeMode, inputs) {
+	static themed({
+		model = null, 
+		searcher = null, 
+		constrained = null, 
+		source = null,
+		target = null,
+		themes = null,
+		inputs = null
+	} = {}) {
 		const items  = [source,  ...inputs, target]
 		const scores = []
 		let subScores = []
 		let inspectScores = []
+		let normalizedScores = []
 		let keyWordsAll = []
 
 		let extras = []
@@ -60,14 +82,22 @@ export class Puzzles
 		for(let i = 1; i < items.length - 1; i++) {
 			const prevWord = items[i - 1]
 			const inputWord = items[i]
-			const themesConsidered = Puzzles.resolveThemes(themeMode, themes, i - 1) 
+			const currentTheme = themes[i - 1]
+			
+			// --- add last word if needed 
 			let finalWord = []
 			if(i == items.length - 2) {
 				finalWord.push(target)
 			}
-			let keyWords = [prevWord, ...extras, ...themesConsidered, ...finalWord]
+
+			let keyWords = [prevWord, ...extras, currentTheme, ...finalWord]
 			keyWords = [...new Set(keyWords)]
 			inspectScores.push(searcher.similarityScores(inputWord, keyWords))
+			normalizedScores.push(
+				keyWords.map((keyWord) => model.normalizedSimilarityScore(
+					inputWord, keyWord
+				))
+			)
 			keyWordsAll.push(keyWords)
 			const score = searcher.normalizedRelevanceScore(inputWord, keyWords) 
 			subScores.push(score)
@@ -87,34 +117,10 @@ export class Puzzles
 			subScores     : subScores,
 			keyWords 	  : keyWordsAll,
 			inspectScores : inspectScores,
+			normalizedScores : normalizedScores,
 			averageScore  : averageScore, 
 			minScore      : minScore,
 			finalScore    : finalScore
 		}
-	}
-	
-	static resolveThemes(themeMode, themes, i) {
-		if(themeMode == null) {
-			return []
-		}
-		
-		if(["TWP", "TWPN", "CT", "TWN"].indexOf(themeMode) == -1) {
-			throw new Error("Unknown theme : " + themeMode)
-		}
-		const themesFiltered = [themes[i]]
-		if(
-		   (themeMode == "TWP"  ||
-            themeMode == "TWPN") &&
-		    themes[i - 1]) {
-			themesFiltered.push(themes[i - 1])
-		}
-		else if(
-			(themeMode == "TWN" ||
-			 themeMode == "TWPN") && 
-			 themes[i + 1]
-		) {
-			themesFiltered.push(themes[i + 1])
-		}
-		return themesFiltered
 	}
 }
