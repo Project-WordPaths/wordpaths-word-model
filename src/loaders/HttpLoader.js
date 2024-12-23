@@ -52,4 +52,16 @@ export default class FSLoader
         model.vectors = vectors
     }
 
+    static async loadVectorsPCA(model, onSubProgress) {
+        const vectorsFile = model.files.vectorsPCA
+        const bytes = await HttpFileReader.load(vectorsFile, { 
+            onProgress: onSubProgress,
+            chunkSize: 50000,
+            type : "arraybuffer"
+        })
+        const floatArray = Encoder_.decodeFloatArrayFromBytes(bytes)
+        const vectors = Array_.partition(floatArray, 2) 
+        model.vectorsPCA = vectors
+    }
+
 }

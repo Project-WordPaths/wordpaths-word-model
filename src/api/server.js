@@ -47,6 +47,11 @@ export class WordModelServer
             res.send(prop)
         })
 
+        modelRouter.get("/pca-vector/:word", (req, res) => {
+            const vector = self.model.pcaVector(req.params.word)
+            res.send(vector)
+        })
+
         modelRouter.get("/vector/:index", (req, res) => {
             const vector = self.model.vector(parseInt(req.params.index))
             res.send(vector)
@@ -317,8 +322,10 @@ export class WordModelServer
             const source = req.body.source 
             const target = req.body.target 
             const themes = req.body.themes
+            const themeMode = req.body.themeMode
             const seed = req.body.seed
             const solver = req.body.solver
+            const walkCount = req.body.walkCount
             const results = Solvers[solver]({
                 model: self.model, 
                 searcher: self.searcher,
@@ -326,7 +333,9 @@ export class WordModelServer
                 source: source,
                 target: target,
                 themes: themes, 
-                seed: seed
+                themeMode: themeMode,
+                seed: seed,
+                walkCount: walkCount
             }) 
             res.send(results)
         })

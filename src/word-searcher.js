@@ -95,7 +95,7 @@ export class WordSearcher
         keyWords, 
         k, 
         { 
-            minProbes = 16 
+            minProbes = 128 
         } = {}
     ) {
         const benchmarker = new Benchmark_()
@@ -173,5 +173,4 @@ export class WordSearcher
         const relevant = this.relevantTo(keyWords, k, options) 
         return relevant.items.map(x => x.word)
     }
- 
 }

@@ -24,6 +24,7 @@ export class WordModel
             vocabulary    : this.source + "/vocabulary.txt",
             wordIndex     : this.source + "/word-index.json", 
             vectors       : this.source + "/vectors.bin",
+            vectorsPCA    : this.source + "/vectors.pca2d.bin",
             cefrMap       : this.source + "/cefr-map.json", 
             cefrGroups    : this.source + "/cefr-groups.json",
             closest       : this.source + "/closest.bin",
@@ -48,16 +49,11 @@ export class WordModel
         this.cefrMap     = null 
         this.cefrGroups  = null
         this.vectorsPCA  = null
-    }
-
-    async load({ onProgress = null, onSubProgress = null } = {}) {
-        const self = this 
-
-        // --- set up loader 
-        await this.setupLoader()
 
         // --- set up tasks 
-        const tasks = new ProgressItems_()
+        this.tasks = new ProgressItems_()
+        const tasks = this.tasks
+        const self = this
         
         tasks.add("load.vocabulary", async () => {
             await this.loader.loadVocabulary(self)
@@ -80,12 +76,24 @@ export class WordModel
             await this.loader.loadClosest(self)
         })
 
-        tasks.add("load.vectors", async () => {
+        tasks.add("load.vectors", async (i, n, onSubProgress) => {
             await this.loader.loadVectors(self, onSubProgress)
         })
 
+        tasks.add("load.vectors-pca", async (i, n, onSubProgress) => {
+            await this.loader.loadVectorsPCA(self, onSubProgress)
+        })
+  
+    }
+
+    async load({ onProgress = null, onSubProgress = null } = {}) {
+        const self = this 
+
+        // --- set up loader 
+        await this.setupLoader()
+
         // --- run tasks 
-        await tasks.run({ onProgress, onSubProgress })
+        await this.tasks.run({ onProgress, onSubProgress })
     }
 
     async setupLoader() {
@@ -98,6 +106,10 @@ export class WordModel
     }
 
     /** === CORE FUNCTIONS === */
+    
+    pcaVector(word) {
+        return this.vectorsPCA[this.indexOfWord(word)]
+    }
     
     vector(index) {
         return this.vectors[index]
